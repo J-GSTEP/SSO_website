@@ -200,14 +200,15 @@ async function fetchJSON(url, options = {}) {
       });
     }
 
-    var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview";
+    // Add your BOT ID below 
+    var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview"; // you can find the token URL via the mobile app channel configuration
     var userdeails = clientApplication.getAccount();
     var userId = clientApplication.account?.accountIdentifier != null ?
       ("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) :
       (Math.random().toString() + Date.now().toString()).substr(0, 64);
 
     const { token } = await fetchJSON(theURL);
-    console.log("Direct Line Token:", token);
+    console.log("Direct Line Token:", token); // Log the token for debugging
 
     const directLine = window.WebChat.createDirectLine({ token });
     const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
@@ -246,11 +247,14 @@ async function fetchJSON(url, options = {}) {
               }).subscribe(
                 id => {
                   if (id === 'retry') {
+                    // bot was not able to handle the invoke, so display the oauthCard
                     return next(action);
                   }
+                  // else: tokenexchange successful and we do not display the oauthCard
                 },
                 error => {
-                  console.error("Token exchange error:", error);
+                  // an error occurred to display the oauthCard
+                  console.error("Token exchange error:", error); // Log the error for debugging
                   return next(action);
                 }
               );
@@ -268,6 +272,7 @@ async function fetchJSON(url, options = {}) {
     });
 
     const styleOptions = {
+      // Add styleOptions to customize Web Chat canvas
       hideUploadButton: true
     };
 
@@ -280,6 +285,9 @@ async function fetchJSON(url, options = {}) {
       document.getElementById('webchat')
     );
   } catch (err) {
-    console.error("An error occurred:", err);
+    console.error("An error occurred:", err); // Log the error for debugging
   }
 })();
+  </script>
+</body>
+</html>
