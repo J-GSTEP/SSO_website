@@ -157,6 +157,7 @@ function exchangeTokenAsync(resourceUri) {
 
 async function fetchJSON(url, options = {}) {
     const res = await fetch(url, {
+	method: 'POST',    
       ...options,
       headers: {
         ...options.headers,
