@@ -193,19 +193,25 @@ async function fetchJSON(url, options = {}) {
 
 
 (async function main() {
+  try {
+    if (clientApplication.getAccount() == null) {
+      await clientApplication.loginPopup(requestObj).then(onSignin).catch(function (error) {
+        console.log(error);
+      });
+    }
 
-  if (clientApplication.getAccount() == null) {await clientApplication.loginPopup(requestObj).then(onSignin).catch(function (error) {console.log(error) });}
-  
-  // Add your BOT ID below 
-  var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview" // you can find the token URL via the mobile app channel configuration
+    // Add your BOT ID below 
+    var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview"; // you can find the token URL via the mobile app channel configuration
     var userdeails = clientApplication.getAccount();
-      var userId = clientApplication.account?.accountIdentifier != null ? 
-					("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) 
-					: (Math.random().toString() + Date.now().toString()).substr(0,64);
-					
-   const { token } = await fetchJSON(theURL);
-   const directLine = window.WebChat.createDirectLine({ token });
-   const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
+    var userId = clientApplication.account?.accountIdentifier != null ?
+      ("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) :
+      (Math.random().toString() + Date.now().toString()).substr(0, 64);
+
+    const { token } = await fetchJSON(theURL);
+    console.log("Direct Line Token:", token); // Log the token for debugging
+
+    const directLine = window.WebChat.createDirectLine({ token });
+    const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
       const { type } = action;
       if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
         dispatch({
@@ -216,7 +222,7 @@ async function fetchJSON(url, options = {}) {
             value: { text: "hello" }
           }
         });
-	      return next(action);
+        return next(action);
       }
       if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
         const activity = action.payload.activity;
@@ -248,20 +254,21 @@ async function fetchJSON(url, options = {}) {
                 },
                 error => {
                   // an error occurred to display the oauthCard
+                  console.error("Token exchange error:", error); // Log the error for debugging
                   return next(action);
                 }
               );
               return;
-            }
-            else
+            } else {
               return next(action);
+            }
           });
-        }
-        else
+        } else {
           return next(action);
+        }
+      } else {
+        return next(action);
       }
-      else
-	      return next(action);
     });
 
     const styleOptions = {
@@ -269,16 +276,16 @@ async function fetchJSON(url, options = {}) {
       hideUploadButton: true
     };
 
-
-  window.WebChat.renderWebChat(
-    {directLine: directLine,
-     store,
-     userID:userId,
-     styleOptions
-    },
-    document.getElementById('webchat')
-  );
-})().catch(err => console.error("An error occurred: " + err));
-  </script>
-</body>
-</html>
+    window.WebChat.renderWebChat(
+      {
+        directLine: directLine,
+        store,
+        userID: userId,
+        styleOptions
+      },
+      document.getElementById('webchat')
+    );
+  } catch (err) {
+    console.error("An error occurred:", err); // Log the error for debugging
+  }
+})();
