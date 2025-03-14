@@ -201,7 +201,7 @@ async function fetchJSON(url, options = {}) {
 					("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) 
 					: (Math.random().toString() + Date.now().toString()).substr(0,64);
 					
-   const { token } = "9zeczG2l14feTfAXPVfhbEo2tRUNeGHpEJrXG0reEURujSPAOX4uJQQJ99BCACi5YpzAArohAAABAZBSyeOJ.DFIztNC8EG0595lcxrLFa6OR91Eu92rH4OiSPKGReJtm61ZvIAqfJQQJ99BCACi5YpzAArohAAABAZBSNYOf";
+   const { token } = await fetchJSON(theURL);
    const directLine = window.WebChat.createDirectLine({ token });
    const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
       const { type } = action;
