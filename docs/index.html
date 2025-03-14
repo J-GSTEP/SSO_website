@@ -193,7 +193,7 @@ async function fetchJSON(url, options = {}) {
 
 
 (async function main() {
-
+  if (clientApplication.getAccount() == null) {await clientApplication.loginPopup(requestObj).then(onSignin).catch(function (error) {console.log(error) });}
   // Add your BOT ID below 
   var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview" // you can find the token URL via the mobile app channel configuration
     var userdeails = clientApplication.getAccount();
