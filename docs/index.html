@@ -50,14 +50,6 @@
         top: 50px;
         overflow: hidden;
       }
-
-      #customWebsite {
-        position: fixed;
-        height: calc(100% - 50px);
-        width: 100%;
-        top: 50px;
-        overflow: hidden;
-      }
   #heading {
     background-color: black;
     background-repeat: no-repeat;
@@ -111,7 +103,9 @@
     <button id="login" name="login" onclick="onSignInClick()" style="float: right;background-color: aliceblue;">Log In</button>
   </div>
 </div>
-<div id="webchat"></div>
+  <div id="webchat">
+  </div>
+
 </div>
 
 <script>
@@ -121,7 +115,6 @@ function onSignin(idToken) {
       let requestObj1 = {
 	      scopes: ["user.read", 'openid', 'profile']
       };
-        reload();
     }
 
     function onSignInClick() {
@@ -162,12 +155,14 @@ function exchangeTokenAsync(resourceUri) {
    }
 }
 
-async function fetchJSON(url, options = {}) {
+async function fetchJSON(url, bearer_token, options = {}) {
     const res = await fetch(url, {
+	method: 'GET',    
       ...options,
       headers: {
         ...options.headers,
         accept: 'application/json',
+	Authorization: `Bearer ${bearer_token}`,      
       }
     });
 
@@ -199,19 +194,28 @@ async function fetchJSON(url, options = {}) {
 
 
 (async function main() {
+  try {
+    if (clientApplication.getAccount() == null) {
+      await clientApplication.loginPopup(requestObj).then(onSignin).catch(function (error) {
+        console.log(error);
+      });
+    }
 
-  if (clientApplication.getAccount() == null) {await clientApplication.loginPopup(requestObj).then(onSignin).catch(function (error) {console.log(error) });}
-  
-  // Add your BOT ID below 
-  var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview" // you can find the token URL via the mobile app channel configuration
-    var userdeails = clientApplication.getAccount();
-      var userId = clientApplication.account?.accountIdentifier != null ? 
-					("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) 
-					: (Math.random().toString() + Date.now().toString()).substr(0,64);
-					
-   const { token } = "9zeczG2l14feTfAXPVfhbEo2tRUNeGHpEJrXG0reEURujSPAOX4uJQQJ99BCACi5YpzAArohAAABAZBSyeOJ.DFIztNC8EG0595lcxrLFa6OR91Eu92rH4OiSPKGReJtm61ZvIAqfJQQJ99BCACi5YpzAArohAAABAZBSNYOf" //await fetchJSON(theURL);
-   const directLine = window.WebChat.createDirectLine({ token });
-   const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
+    // Add your BOT ID below 
+    var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview"; // you can find the token URL via the mobile app channel configuration
+    var bearer_token = '9zeczG2l14feTfAXPVfhbEo2tRUNeGHpEJrXG0reEURujSPAOX4uJQQJ99BCACi5YpzAArohAAABAZBSyeOJ.DFIztNC8EG0595lcxrLFa6OR91Eu92rH4OiSPKGReJtm61ZvIAqfJQQJ99BCACi5YpzAArohAAABAZBSNYOf';
+	  var userdeails = clientApplication.getAccount();
+    var userId = clientApplication.account?.accountIdentifier != null ?
+      ("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) :
+      (Math.random().toString() + Date.now().toString()).substr(0, 64);
+
+    const { token } = await fetchJSON(theURL, bearer_token);
+    console.log("Direct Line Token:", token); // Log the token for debugging
+
+    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://europe.directline.botframework.com' });
+    console.log("Direct Line:", directLine);
+	  
+    const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
       const { type } = action;
       if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
         dispatch({
@@ -222,7 +226,7 @@ async function fetchJSON(url, options = {}) {
             value: { text: "hello" }
           }
         });
-	      return next(action);
+        return next(action);
       }
       if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
         const activity = action.payload.activity;
@@ -254,20 +258,21 @@ async function fetchJSON(url, options = {}) {
                 },
                 error => {
                   // an error occurred to display the oauthCard
+                  console.error("Token exchange error:", error); // Log the error for debugging
                   return next(action);
                 }
               );
               return;
-            }
-            else
+            } else {
               return next(action);
+            }
           });
-        }
-        else
+        } else {
           return next(action);
+        }
+      } else {
+        return next(action);
       }
-      else
-	      return next(action);
     });
 
     const styleOptions = {
@@ -275,16 +280,18 @@ async function fetchJSON(url, options = {}) {
       hideUploadButton: true
     };
 
-
-  window.WebChat.renderWebChat(
-    {directLine: directLine,
-     store,
-     userID:userId,
-     styleOptions
-    },
-    document.getElementById('webchat')
-  );
-})().catch(err => console.error("An error occurred: " + err));
+    window.WebChat.renderWebChat(
+      {
+        directLine: directLine,
+        store,
+        styleOptions
+      },
+      document.getElementById('webchat')
+    );
+  } catch (err) {
+    console.error("An error occurred:", err); // Log the error for debugging
+  }
+})();
   </script>
 </body>
 </html>
