@@ -209,10 +209,10 @@ async function fetchJSON(url, bearer_token, options = {}) {
       ("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) :
       (Math.random().toString() + Date.now().toString()).substr(0, 64);
 
-    const { token } = await fetchJSON(theURL, userdeails.idToken);
+    const { token } = await fetchJSON(theURL, userdeails.idToken, { method: 'POST' });  
     console.log("Direct Line Token:", token); // Log the token for debugging
 
-    const directLine = window.WebChat.createDirectLine({ token: token, domain: "https://europe.directline.botframework.com" });
+    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://europe.directline.botframework.com' });
     console.log("Direct Line:", directLine);
 	  
     const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
