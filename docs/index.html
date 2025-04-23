@@ -212,7 +212,7 @@ async function fetchJSON(url, bearer_token, options = {}) {
     const { token } = await fetchJSON(theURL, userdeails.idToken);  
     console.log("Direct Line Token:", token); // Log the token for debugging
 
-    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://europe.directline.botframework.com' });
+    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://directline.botframework.com/v3/directline/conversations' });
     console.log("Direct Line:", directLine);
 	  
     const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
