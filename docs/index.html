@@ -157,7 +157,7 @@ function exchangeTokenAsync(resourceUri) {
 
 async function fetchJSON(url, bearer_token, options = {}) {
     const res = await fetch(url, {
-	method: 'POST',    
+	method: 'GET',    
       ...options,
       headers: {
         ...options.headers,
@@ -212,7 +212,7 @@ async function fetchJSON(url, bearer_token, options = {}) {
     const { token } = await fetchJSON(theURL, userdeails.idToken);  
     console.log("Direct Line Token:", token); // Log the token for debugging
 
-    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline' });
+    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://europe.directline.botframework.com' });
     console.log("Direct Line:", directLine);
 	  
     const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
