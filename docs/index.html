@@ -157,7 +157,7 @@ function exchangeTokenAsync(resourceUri) {
 
 async function fetchJSON(url, bearer_token, options = {}) {
     const res = await fetch(url, {
-	method: 'GET',    
+	method: 'POST',    
       ...options,
       headers: {
         ...options.headers,
@@ -202,17 +202,18 @@ async function fetchJSON(url, bearer_token, options = {}) {
     }
 
     // Add your BOT ID below 
-    var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview"; // you can find the token URL via the mobile app channel configuration
+    // var theURL = "https://b1c225f029a1efe1810c05275f8d11.4a.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr88a_loginBot/directline/token?api-version=2022-03-01-preview"; // you can find the token URL via the mobile app channel configuration
+    var theURL = "https://europe.directline.botframework.com/v3/directline/tokens/generate";
     var bearer_token = '9zeczG2l14feTfAXPVfhbEo2tRUNeGHpEJrXG0reEURujSPAOX4uJQQJ99BCACi5YpzAArohAAABAZBSyeOJ.DFIztNC8EG0595lcxrLFa6OR91Eu92rH4OiSPKGReJtm61ZvIAqfJQQJ99BCACi5YpzAArohAAABAZBSNYOf';
 	  var userdeails = clientApplication.getAccount();
     var userId = clientApplication.account?.accountIdentifier != null ?
       ("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) :
       (Math.random().toString() + Date.now().toString()).substr(0, 64);
 
-    const { token } = await fetchJSON(theURL, userdeails.idToken);  
+    const { token } = await fetchJSON(theURL, bearer_token).token; //userdeails.idToken);  
     console.log("Direct Line Token:", token); // Log the token for debugging
 
-    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://europe.directline.botframework.com' });
+    const directLine = window.WebChat.createDirectLine({ token: token, domain: 'https://europe.directline.botframework.com/v3/directline/conversations' });
     console.log("Direct Line:", directLine);
 	  
     const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
