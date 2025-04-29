@@ -113,7 +113,7 @@ function onSignin(idToken) {
       let user = clientApplication.getAccount();
       document.getElementById("userName").innerHTML = "Currently logged in as " + user.name;
       setTimeout(() => {
-          userNameElement.innerHTML = "";
+        document.getElementById("userName").innerHTML = "";
       }, 10000);       // Clear the message after 10 seconds (10,000 milliseconds)
       let requestObj1 = {
 	      scopes: ["user.read", 'openid', 'profile']
